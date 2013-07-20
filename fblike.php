@@ -42,7 +42,7 @@
       // 取的粉絲團文章
       loadPosts = function () {
         document.getElementById('status').innerHTML = '正在取得文章'
-        FB.api('/105647582858237/feed?fields=id', function (resp) {
+        FB.api('fql?q', function (resp) {
           var i = 0,
               l = resp.data.length;
           document.getElementById('status').innerHTML = '正在按讚...'
