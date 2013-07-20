@@ -4,9 +4,10 @@
     <meta charset="utf-8">
     <title>Shock Liker</title>
     <style>
-      body {
+      iframe {
         min-width: 250px;
         overflow: hidden;
+        border: 0;
       }
     </style>
     <script>
@@ -42,26 +43,25 @@
       // 取的粉絲團文章
       loadPosts = function () {
         document.getElementById('status').innerHTML = '正在取得文章'
-        FB.api('fql?q', function (resp) {
+        FB.api('fql?q=SELECT%20post_id%2C%20type%20FROM%20stream%20WHERE%20source_id%20%3D%20105647582858237%20AND%20like_info.user_likes%20%3D%200', function (resp) {
           var i = 0,
               l = resp.data.length;
+
           document.getElementById('status').innerHTML = '正在按讚...'
           today = new Date();
           for (; i < l; i += 1) {
-            if (today - new Date(resp.data[i].created_time) < 604800000) {// 1 week
-              FB.api(resp.data[i].id + '/likes', 'post', function (resp) {
-                if (resp == true) {
-                  document.getElementById('countContainer').style.color = '#222'
-                  document.getElementById('count').innerHTML = parseInt(document.getElementById('count').innerHTML, 10) + 1
-                }
-              })
-            } else {
-              document.getElementById('status').innerHTML = '程序已完成。<br/>自 ' + today.getFullYear() + '-' +
-              (today.getMonth() > 8 ? today.getMonth() + 1 : '0' + (today.getMonth() + 1)) + '-' +
-              (today.getDate() > 9 ? today.getDate() : '0' + today.getDate()) + ' 後的文章已按讚'
-              break;
-            }
+            if (resp.data[i].type == null)
+              continue;
+            FB.api(resp.data[i].post_id + '/likes', 'post', function (resp) {
+              if (resp == true) {
+                document.getElementById('countContainer').style.color = '#222'
+                document.getElementById('count').innerHTML = parseInt(document.getElementById('count').innerHTML, 10) + 1
+              }
+            })
           }
+          document.getElementById('status').innerHTML = '程序結束。'
+
+          parent.done();
         });
       }
     </script>
